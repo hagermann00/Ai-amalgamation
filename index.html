@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Amalgamation Live UI</title>
+</head>
+<body>
+  <h1>AI Amalgamation System</h1>
+  <textarea id="prompt" rows="5" cols="60" placeholder="Enter your prompt here..."></textarea><br />
+  <button onclick="runAll()">Run All</button>
+  <pre id="results" style="white-space: pre-wrap; border: 1px solid #ccc; padding: 1em; margin-top: 1em;"></pre>
+
+  <script>
+    const baseURL = "https://YOUR-BACKEND-RENDER-URL.onrender.com"; // Replace this after deploy
+
+    async function fetchModel(model, prompt) {
+      const res = await fetch(\`\${baseURL}/api/query/\${model}\`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      return data.response || data.error || '[No response]';
+    }
+
+    async function runAll() {
+      const prompt = document.getElementById("prompt").value;
+      const output = [];
+      for (const model of ['openai', 'claude', 'gemini']) {
+        output.push("== " + model.toUpperCase() + " ==\n" + await fetchModel(model, prompt) + "\n");
+      }
+      document.getElementById("results").textContent = output.join("\n------------------\n\n");
+    }
+  </script>
+</body>
+</html>
